@@ -1,22 +1,4 @@
-from enum import Enum, auto
-from dataclasses import dataclass
-
-class TokenType(Enum):
-    IDENTIFIER = auto()
-    KEYWORD = auto()
-    NUMBER = auto()
-    STRING = auto()
-    OPERATOR = auto()
-    SYMBOL = auto()
-    COMMENT = auto()
-    EOF = auto()
-
-@dataclass
-class Token:
-    type: TokenType
-    value: str
-    line: int
-    column: int
+from tokens import Token, TokenType
 
 class Tokenizer:
 
@@ -276,19 +258,3 @@ WHITESPACE = set([
      "\r",
      "\n",
 ])
-
-source = """
-VAR
-    Motor_1 : BOOL;
-    Count : INT;
-END_VAR
-
-(* Multi-line
-   comment *)
-IF Count >= 10 THEN
-    Message := 'Count reached 10';
-END_IF;
-"""
-
-for token in Tokenizer(source).tokenize():
-    print(token)
