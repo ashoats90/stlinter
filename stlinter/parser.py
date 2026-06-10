@@ -1,5 +1,5 @@
 from stlinter.tokens import Token, TokenType
-from stlinter.ast_nodes import Program, VarDecl
+from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier
 
 class ParserError(Exception):
     pass
@@ -49,6 +49,8 @@ class Parser:
         while not self._at_end():
             if self._check(TokenType.KEYWORD, "VAR"):
                 statements.extend(self._parse_var_block())
+            elif self._check(TokenType.IDENTIFIER):
+                statements.append(self._parse_assignment())
             else:
                 current_token = self._peek()
                 raise ParserError(
@@ -82,4 +84,40 @@ class Parser:
             name_token.line,
             name_token.column,
         )
+    
+    def _parse_assignment(self) -> Assignment:
+        target_token = self._expect(TokenType.IDENTIFIER)
+        self._expect(TokenType.OPERATOR, ":=")
+        value = self._parse_expression()
+        self._expect(TokenType.SYMBOL, ";")
 
+        return Assignment(
+            target=target_token.value,
+            value=value,
+            line=target_token.line,
+            column=target_token.column,
+        )
+
+    def _parse_expression(self) -> object:
+        if self._check(TokenType.KEYWORD, "TRUE"):
+            token = self._expect(TokenType.KEYWORD, "TRUE")
+            return BooleanLiteral(True, token.line, token.column)
+        elif self._check(TokenType.KEYWORD, "FALSE"):
+            token = self._expect(TokenType.KEYWORD, "FALSE")
+            return BooleanLiteral(False, token.line, token.column)
+        elif self._check(TokenType.STRING):
+            token = self._expect(TokenType.STRING)
+            return StringLiteral(token.value[1:-1], token.line, token.column)
+        elif self._check(TokenType.NUMBER):
+            token = self._expect(TokenType.NUMBER)
+            return NumberLiteral(token.value, token.line, token.column)
+        elif self._check(TokenType.IDENTIFIER):
+            token = self._expect(TokenType.IDENTIFIER)
+            return Identifier(token.value, token.line, token.column)
+        
+        current_token = self._peek()
+
+        raise ParserError(
+            f'Unexpected token {current_token.type.name}("{current_token.value}") '
+            f"at line {current_token.line}, column {current_token.column}"
+        )
