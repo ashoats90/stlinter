@@ -1,4 +1,4 @@
-from tokens import Token, TokenType
+from stlinter.tokens import Token, TokenType
 
 class Tokenizer:
 

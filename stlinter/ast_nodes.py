@@ -9,4 +9,4 @@ class VarDecl:
     name: str
     type_name: str
     line: int
-    col: int
+    column: int
