@@ -1,5 +1,5 @@
 from stlinter.tokens import Token, TokenType
-from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier
+from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier, IfStatement
 
 class ParserError(Exception):
     pass
@@ -51,6 +51,8 @@ class Parser:
                 statements.extend(self._parse_var_block())
             elif self._check(TokenType.IDENTIFIER):
                 statements.append(self._parse_assignment())
+            elif self._check(TokenType.KEYWORD, "IF"):
+                statements.append(self._parse_if_statement())
             else:
                 current_token = self._peek()
                 raise ParserError(
@@ -120,4 +122,37 @@ class Parser:
         raise ParserError(
             f'Unexpected token {current_token.type.name}("{current_token.value}") '
             f"at line {current_token.line}, column {current_token.column}"
+        )
+    
+    def _parse_statement(self) -> object:
+        if self._check(TokenType.KEYWORD, "IF"):
+            return self._parse_if_statement()
+        
+        if self._check(TokenType.IDENTIFIER):
+            return self._parse_assignment()
+        
+        current_token = self._peek()
+        raise ParserError(
+            f'Unexpected token {current_token.type.name}("{current_token.value}") '
+            f"at line {current_token.line}, column {current_token.column}"
+        )
+    
+    def _parse_if_statement(self) -> IfStatement:
+        if_token = self._expect(TokenType.KEYWORD, "IF")
+        condition = self._parse_expression()
+        self._expect(TokenType.KEYWORD, "THEN")
+
+        body = []
+
+        while not self._check(TokenType.KEYWORD, "END_IF"):
+            body.append(self._parse_statement())
+
+        self._expect(TokenType.KEYWORD, "END_IF")
+        self._expect(TokenType.SYMBOL, ";")
+
+        return IfStatement(
+            condition=condition,
+            body=body,
+            line=if_token.line,
+            column=if_token.column,
         )

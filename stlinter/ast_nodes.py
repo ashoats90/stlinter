@@ -41,3 +41,10 @@ class Identifier:
     value: str
     line: int
     column: int
+
+@dataclass
+class IfStatement:
+    condition: object
+    body: list
+    line: int
+    column: int

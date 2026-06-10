@@ -2,7 +2,7 @@ import pytest
 
 from stlinter.tokenizer import Tokenizer
 from stlinter.parser import Parser, ParserError
-from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier
+from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier, IfStatement
 
 
 def parse_source(source: str) -> Program:
@@ -138,3 +138,28 @@ def test_assignment_missing_expression_raises():
 def test_assignment_missing_semicolon_raises():
     with pytest.raises(ParserError):
         parse_source("MotorRun := TRUE")
+
+def test_parses_if_statement_with_assignment_body():
+    program = parse_source("""
+IF MotorRun THEN
+    Message := 'Running';
+END_IF;
+""")
+    
+    assert program == Program(
+        statements=[
+            IfStatement(
+                condition=Identifier("MotorRun", line=2, column=4),
+                body=[
+                    Assignment(
+                        target="Message",
+                        value=StringLiteral("Running", line=3, column=16),
+                        line=3,
+                        column=5,
+                    )
+                ],
+                line=2,
+                column=1,
+            )
+        ]
+    )
