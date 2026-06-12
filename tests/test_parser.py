@@ -163,3 +163,39 @@ END_IF;
             )
         ]
     )
+
+def test_if_missing_then_raises_parser_error():
+    with pytest.raises(ParserError):
+        parse_source("""
+IF MotorRun
+    Message := 'Running';
+END_IF;
+""")
+
+
+def test_if_missing_end_if_raises_parser_error():
+    with pytest.raises(ParserError):
+        parse_source("""
+IF MotorRun THEN
+    Message := 'Running';
+""")
+
+
+def test_if_missing_semicolon_after_end_if_raises_parser_error():
+    with pytest.raises(ParserError):
+        parse_source("""
+IF MotorRun THEN
+    Message := 'Running';
+END_IF
+""")
+        
+def test_parses_nested_if_statement():
+    program = parse_source("""
+IF MotorRun THEN
+    IF StartButton THEN
+        Message := 'Running';
+    END_IF;
+END_IF;
+""")
+
+    assert len(program.statements) == 1
