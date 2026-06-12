@@ -2,7 +2,7 @@ import pytest
 
 from stlinter.tokenizer import Tokenizer
 from stlinter.parser import Parser, ParserError
-from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier, IfStatement
+from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier, IfStatement, BinaryExpression
 
 
 def parse_source(source: str) -> Program:

@@ -1,5 +1,5 @@
 from stlinter.tokens import Token, TokenType
-from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier, IfStatement
+from stlinter.ast_nodes import Program, VarDecl, Assignment, BooleanLiteral, StringLiteral, NumberLiteral, Identifier, IfStatement, BinaryExpression
 
 class ParserError(Exception):
     pass
@@ -100,7 +100,7 @@ class Parser:
             column=target_token.column,
         )
 
-    def _parse_expression(self) -> object:
+    def _parse_primary(self) -> object:
         if self._check(TokenType.KEYWORD, "TRUE"):
             token = self._expect(TokenType.KEYWORD, "TRUE")
             return BooleanLiteral(True, token.line, token.column)
@@ -123,6 +123,23 @@ class Parser:
             f'Unexpected token {current_token.type.name}("{current_token.value}") '
             f"at line {current_token.line}, column {current_token.column}"
         )
+    
+    def _parse_expression(self) -> object:
+        left = self._parse_primary()
+
+        if self._check(TokenType.OPERATOR) and self._peek().value in BINARY_OPERATORS:
+            operator_token = self._advance()
+            right = self._parse_primary()
+
+            return BinaryExpression(
+                left=left,
+                operator=operator_token.value,
+                right=right,
+                line=left.line,
+                column=left.column,
+            )
+        
+        return left
     
     def _parse_statement(self) -> object:
         if self._check(TokenType.KEYWORD, "IF"):
@@ -156,3 +173,5 @@ class Parser:
             line=if_token.line,
             column=if_token.column,
         )
+    
+BINARY_OPERATORS = {"+", "-", "*", "/", "=", "<>", "<", ">", "<=", ">="}
