@@ -48,3 +48,11 @@ class IfStatement:
     body: list
     line: int
     column: int
+
+@dataclass
+class BinaryExpression:
+    left: object
+    operator: str
+    right: object
+    line: int
+    column: int

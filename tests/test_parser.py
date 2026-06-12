@@ -199,3 +199,54 @@ END_IF;
 """)
 
     assert len(program.statements) == 1
+
+def test_parses_if_condition_with_comparison():
+    program = parse_source("""
+IF Count >= 10 THEN
+    MotorRun := TRUE;
+END_IF;
+""")
+    
+    assert program == Program(
+        statements=[
+            IfStatement(
+                condition=BinaryExpression(
+                    left=Identifier("Count", line=2, column=4),
+                    operator=">=",
+                    right=NumberLiteral("10", line=2, column=13),
+                    line=2,
+                    column=4,
+                ),
+                body=[
+                    Assignment(
+                        target="MotorRun",
+                        value=BooleanLiteral(True, line=3, column=17),
+                        line=3,
+                        column=5,
+                    )
+                ],
+                line=2,
+                column=1,
+            )
+        ]
+    )
+
+def test_parses_assignment_with_addition_expression():
+    program = parse_source("Count := Count + 1;")
+
+    assert program == Program(
+        statements=[
+            Assignment(
+                target="Count",
+                value=BinaryExpression(
+                    left=Identifier("Count", line=1, column=10),
+                    operator="+",
+                    right=NumberLiteral("1", line=1, column=18),
+                    line=1,
+                    column=10,
+                ),
+                line=1,
+                column=1,
+            )
+        ]
+    )
