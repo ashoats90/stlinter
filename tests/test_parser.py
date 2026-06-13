@@ -334,3 +334,7 @@ def test_parses_parenthesized_expression_precedence():
             )
         ]
     )
+
+def test_missing_closing_parenthesis_raises_parser_error():
+    with pytest.raises(ParserError):
+        parse_source("Result := (A + B;")
