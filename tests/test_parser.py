@@ -158,6 +158,7 @@ END_IF;
                         column=5,
                     )
                 ],
+                else_branch = None,
                 line=2,
                 column=1,
             )
@@ -225,6 +226,7 @@ END_IF;
                         column=5,
                     )
                 ],
+                else_branch = None,
                 line=2,
                 column=1,
             )

@@ -46,6 +46,7 @@ class Identifier:
 class IfStatement:
     condition: object
     body: list
+    else_branch: object | None
     line: int
     column: int
 
