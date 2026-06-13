@@ -308,3 +308,29 @@ def test_parses_precedence_comparison_addition_multiplication():
             )
         ]
     )
+
+def test_parses_parenthesized_expression_precedence():
+    program = parse_source("Result := (A + B) * C;")
+
+    assert program == Program(
+        statements=[
+            Assignment(
+                target="Result",
+                value=BinaryExpression(
+                    left=BinaryExpression(
+                        left=Identifier("A", line=1, column=12),
+                        operator="+",
+                        right=Identifier("B", line=1, column=16),
+                        line=1,
+                        column=12,
+                    ),
+                    operator="*",
+                    right=Identifier("C", line=1, column=21),
+                    line=1,
+                    column=12,
+                ),
+                line=1,
+                column=1,
+            )
+        ]
+    )
