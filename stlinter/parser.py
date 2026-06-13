@@ -101,6 +101,11 @@ class Parser:
         )
 
     def _parse_primary(self) -> object:
+        if self._check(TokenType.SYMBOL, "("):
+            self._expect(TokenType.SYMBOL, "(")
+            expression = self._parse_expression()
+            self._expect(TokenType.SYMBOL, ")")
+            return expression
         if self._check(TokenType.KEYWORD, "TRUE"):
             token = self._expect(TokenType.KEYWORD, "TRUE")
             return BooleanLiteral(True, token.line, token.column)

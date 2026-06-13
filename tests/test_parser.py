@@ -335,6 +335,32 @@ def test_parses_parenthesized_expression_precedence():
         ]
     )
 
+def test_parses_parenthesized_expression_precedence_2():
+    program = parse_source("Result := A * (B + C);")
+
+    assert program == Program(
+        statements=[
+            Assignment(
+                target="Result",
+                value=BinaryExpression(
+                    left=Identifier("A", line=1, column=11),
+                    operator="*",
+                    right=BinaryExpression(
+                        left=Identifier("B", line=1, column=16),
+                        operator="+",
+                        right=Identifier("C", line=1, column=20),
+                        line=1,
+                        column=16,
+                    ),
+                    line=1,
+                    column=11,
+                ),
+                line=1,
+                column=1,
+            )
+        ]
+    )
+
 def test_missing_closing_parenthesis_raises_parser_error():
     with pytest.raises(ParserError):
         parse_source("Result := (A + B;")
