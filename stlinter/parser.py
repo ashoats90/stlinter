@@ -125,13 +125,16 @@ class Parser:
         )
     
     def _parse_expression(self) -> object:
-        left = self._parse_primary()
+        return self._parse_comparison()
+    
+    def _parse_comparison(self) -> object:
+        left = self._parse_addition()
 
-        if self._check(TokenType.OPERATOR) and self._peek().value in BINARY_OPERATORS:
+        while self._check(TokenType.OPERATOR) and self._peek().value in {"=", "<>", "<", ">", "<=", ">="}:
             operator_token = self._advance()
-            right = self._parse_primary()
+            right = self._parse_addition()
 
-            return BinaryExpression(
+            left = BinaryExpression(
                 left=left,
                 operator=operator_token.value,
                 right=right,
@@ -139,6 +142,40 @@ class Parser:
                 column=left.column,
             )
         
+        return left
+    
+    def _parse_addition(self) -> object:
+        left = self._parse_multiplication()
+
+        while self._check(TokenType.OPERATOR) and self._peek().value in {"+", "-"}:
+            operator_token = self._advance()
+            right = self._parse_multiplication()
+
+            left = BinaryExpression(
+                left=left,
+                operator=operator_token.value,
+                right=right,
+                line=left.line,
+                column=left.column,
+            )
+
+        return left
+    
+    def _parse_multiplication(self) -> object:
+        left = self._parse_primary()
+
+        while self._check(TokenType.OPERATOR) and self._peek().value in {"*", "/"}:
+            operator_token = self._advance()
+            right = self._parse_primary()
+
+            left = BinaryExpression(
+                left=left,
+                operator=operator_token.value,
+                right=right,
+                line=left.line,
+                column=left.column,
+            )
+
         return left
     
     def _parse_statement(self) -> object:

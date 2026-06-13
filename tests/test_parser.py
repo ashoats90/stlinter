@@ -250,3 +250,61 @@ def test_parses_assignment_with_addition_expression():
             )
         ]
     )
+
+def test_parses_precedence_addition_multiplication():
+    program = parse_source("Result := A + B * C;")
+
+    assert program == Program(
+        statements=[
+            Assignment(
+                target="Result",
+                value=BinaryExpression(
+                    left=Identifier("A", line=1, column=11),
+                    operator="+",
+                    right=BinaryExpression(
+                        left=Identifier("B", line=1, column=15),
+                        operator="*",
+                        right=Identifier("C", line=1, column=19),
+                        line=1,
+                        column=15,
+                    ),
+                    line=1,
+                    column=11,
+                ),
+                line=1,
+                column=1,
+            )
+        ]
+    )
+
+def test_parses_precedence_comparison_addition_multiplication():
+    program = parse_source("Result := A + B >= C * D;")
+
+    assert program == Program(
+        statements=[
+            Assignment(
+                target="Result",
+                value=BinaryExpression(
+                    left=BinaryExpression(
+                        left=Identifier("A", line=1, column=11),
+                        operator="+",
+                        right=Identifier("B", line=1, column=15),
+                        line=1,
+                        column=11,
+                    ),
+                    operator=">=",
+                    right=BinaryExpression(
+                        left=Identifier("C", line=1, column=20),
+                        operator="*",
+                        right=Identifier("D", line=1, column=24),
+                        line=1,
+                        column=20,
+                    ),
+                    line=1,
+                    column=11,
+                ),
+                line=1,
+                column=1,
+            )
+        ]
+    )
