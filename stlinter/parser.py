@@ -203,8 +203,24 @@ class Parser:
 
         body = []
 
-        while not self._check(TokenType.KEYWORD, "END_IF"):
+        while not (
+            self._check(TokenType.KEYWORD, "ELSE")
+            or self._check(TokenType.KEYWORD, "ELSIF")
+            or self._check(TokenType.KEYWORD, "END_IF")
+        ):
             body.append(self._parse_statement())
+
+        else_branch = None
+
+        if self._check(TokenType.KEYWORD, "ELSE"):
+            self._expect(TokenType.KEYWORD, "ELSE")
+
+            else_body = []
+
+            while not self._check(TokenType.KEYWORD, "END_IF"):
+                else_body.append(self._parse_statement())
+
+            else_branch = else_body
 
         self._expect(TokenType.KEYWORD, "END_IF")
         self._expect(TokenType.SYMBOL, ";")
@@ -212,6 +228,7 @@ class Parser:
         return IfStatement(
             condition=condition,
             body=body,
+            else_branch=else_branch,
             line=if_token.line,
             column=if_token.column,
         )
