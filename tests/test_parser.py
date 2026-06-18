@@ -397,3 +397,44 @@ END_IF;
             )
         ]
     )
+
+def test_parses_if_elsif_statement():
+    program = parse_source("""
+IF A THEN
+    X := 1;
+ELSIF B THEN
+    X := 2;
+END_IF;
+""")
+    
+    assert program == Program(
+        statements=[
+            IfStatement(
+                condition=Identifier("A", line=2, column=4),
+                body=[
+                    Assignment(
+                        "X",
+                        NumberLiteral("1", line=3, column=10),
+                        line=3,
+                        column=5,
+                    )
+                ],
+                else_branch=IfStatement(
+                    condition=Identifier("B", line=4, column=7),
+                    body=[
+                        Assignment(
+                            "X",
+                            NumberLiteral("2", line=5, column=10),
+                            line=5,
+                            column=5,
+                        )
+                    ],
+                    else_branch=None,
+                    line=4,
+                    column=1,
+                ),
+                line=2,
+                column=1,
+            )
+        ]
+    )
